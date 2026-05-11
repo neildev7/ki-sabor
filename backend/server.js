@@ -24,6 +24,8 @@ app.use('/api/produtos', produtoRoutes);
 const mesaRoutes = require('./src/routes/mesaRoutes');
 app.use('/api/mesas', mesaRoutes);
 
+const pedidoRoutes = require('./src/routes/pedidoRoutes');
+app.use('/api/pedidos', pedidoRoutes);
 
 // Definindo a porta e ligando o servidor
 const PORT = process.env.PORT || 3333;

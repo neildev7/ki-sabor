@@ -1,0 +1,185 @@
+.status-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--fundo-app, #F8F9FA);
+}
+
+.header-status {
+    background-color: var(--verde-kisabor, #4A5D23);
+    color: var(--branco, #FFFFFF);
+    padding: 2.5rem 1rem 1.5rem;
+    text-align: center;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    box-shadow: 0 4px 6px rgba(74, 93, 35, 0.3);
+}
+
+.header-status p {
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+.conteudo-status {
+    padding: 2rem 1.5rem;
+    text-align: center;
+    flex: 1;
+}
+
+.titulo-pedido {
+    color: var(--verde-kisabor, #4A5D23);
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.card-status {
+    background: var(--branco, #FFFFFF);
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    margin-bottom: 1.5rem;
+}
+
+.badge-status {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.badge-pendente {
+    background-color: #FEFCBF;
+    color: #B7791F;
+}
+
+.badge-confirmado {
+    background-color: #C6F6D5;
+    color: #22543D;
+}
+
+.texto-status {
+    color: var(--texto-secundario, #718096);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.cronometro {
+    font-size: 4rem;
+    font-weight: 700;
+    color: #E53E3E; /* Vermelho para chamar atenção pro tempo */
+    margin: 1.5rem 0;
+    font-family: monospace;
+    letter-spacing: -2px;
+}
+
+.acoes-pedido {
+    display: flex;
+    gap: 12px;
+    margin-top: 1.5rem;
+}
+
+.btn-acao {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-editar {
+    background-color: #EDF2F7;
+    color: #4A5568;
+}
+
+.btn-cancelar {
+    background-color: #FED7D7;
+    color: #C53030;
+}
+
+.btn-acao:active {
+    transform: scale(0.96);
+}
+
+.btn-acao:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* --- STATUS DINÂMICO E ATRASO --- */
+.status-dinamico-container {
+    padding: 2rem 0;
+    border-bottom: 1px solid #EDF2F7;
+    margin-bottom: 1.5rem;
+}
+
+.icone-gigante {
+    font-size: 5rem;
+    animation: flutuar 3s ease-in-out infinite;
+}
+
+@keyframes flutuar {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+.btn-novo-pedido {
+    width: 100%;
+    background-color: transparent;
+    border: 2px solid var(--verde-kisabor);
+    color: var(--verde-kisabor);
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: all 0.2s;
+}
+
+.btn-novo-pedido:active {
+    background-color: var(--verde-kisabor);
+    color: white;
+}
+
+.alerta-atraso-box {
+    background-color: #FFF5F5;
+    border: 1px solid #FEB2B2;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.alerta-atraso-box p {
+    color: #C53030;
+    margin: 0 0 1rem 0;
+    font-size: 0.95rem;
+}
+
+.btn-apressar {
+    width: 100%;
+    background-color: #E53E3E;
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+}
+
+.btn-apressar:disabled {
+    background-color: #48BB78;
+    box-shadow: none;
+    cursor: default;
+}

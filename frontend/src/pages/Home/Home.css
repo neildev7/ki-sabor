@@ -1,0 +1,258 @@
+/* --- TELA DE SPLASH (NOVA ANIMAÇÃO) --- */
+.splash-overlay {
+    position: fixed; 
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background-color: var(--verde-kisabor);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--branco);
+    z-index: 99999; 
+    transition: opacity 0.8s ease-out, visibility 0.8s;
+}
+
+.splash-overlay.escondido {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.splash-conteudo {
+    text-align: center;
+    margin-top: -10vh; /* Mantém centralizado no campo de visão */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 1. O efeito de vento flutuando */
+.splash-logo {
+    font-family: 'Great Vibes', cursive;
+    font-size: 4.5rem;
+    margin: 0;
+    opacity: 0;
+    /* Animação dura 1.5s com uma curva de aceleração suave */
+    animation: flutuarVento 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes flutuarVento {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) skewX(-8deg); /* Vem de baixo e ligeiramente inclinado pelo "vento" */
+        filter: blur(10px); /* Começa embaçado */
+    }
+    60% {
+        opacity: 1;
+        transform: translateY(-5px) skewX(2deg); /* Passa um pouquinho do ponto */
+        filter: blur(0);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) skewX(0); /* Pousa suavemente */
+        filter: blur(0);
+    }
+}
+
+/* 2. O efeito de escrita revelada */
+.splash-subtitulo {
+    font-size: 1.1rem;
+    margin-top: 5px;
+    letter-spacing: 2px;
+    opacity: 0;
+    /* Delay de 0.8s: espera a logo subir para começar a escrever */
+    animation: escritaSuave 1.2s ease-out 0.8s forwards;
+    white-space: nowrap;
+}
+
+@keyframes escritaSuave {
+    0% {
+        opacity: 0;
+        clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%); /* Esconde tudo cortando a imagem */
+        transform: translateX(-15px); /* Dá um leve empurrãozinho da esquerda */
+    }
+    100% {
+        opacity: 1;
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); /* Revela da esquerda pra direita */
+        transform: translateX(0);
+    }
+}
+
+/* --- TELA BASE --- */
+/* (Mantenha o resto do seu CSS igual a partir daqui) */
+
+/* --- TELA BASE --- */
+.selecao-mesa-screen {
+    background-color: var(--fundo-app);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.header-kisabor-simples {
+    background-color: var(--verde-kisabor);
+    color: var(--branco);
+    padding: 1.5rem;
+    text-align: center;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.logo-texto-pequeno {
+    font-family: 'Great Vibes', cursive;
+    font-size: 2.5rem;
+    margin: 0;
+}
+
+.conteudo-mesas {
+    padding: 2rem 1.5rem;
+}
+
+.titulo-boas-vindas {
+    color: var(--verde-kisabor);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.texto-instrucao {
+    color: var(--texto-secundario);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* --- ETAPA 1: BOTÕES DE SALÃO --- */
+.botoes-salao {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    animation: fadeIn 0.4s ease;
+}
+
+.btn-salao {
+    background: var(--branco);
+    border: 2px solid #E2E8F0;
+    border-radius: 20px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    text-align: left;
+}
+
+.btn-salao:active {
+    transform: scale(0.98);
+    border-color: var(--verde-kisabor);
+    background: rgba(74, 93, 35, 0.05);
+}
+
+.icone-salao {
+    font-size: 2.5rem;
+    background: #F8F9FA;
+    padding: 1rem;
+    border-radius: 16px;
+}
+
+.info-salao h3 {
+    margin: 0 0 4px 0;
+    font-size: 1.3rem;
+    color: var(--texto-principal);
+}
+
+.info-salao p {
+    margin: 0;
+    color: var(--texto-secundario);
+    font-size: 0.95rem;
+}
+
+/* --- ETAPA 2: CABEÇALHO COM BOTÃO VOLTAR E GRID DE MESAS --- */
+.cabecalho-mesas {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+    animation: fadeIn 0.4s ease;
+}
+
+.btn-voltar-salao {
+    background: none;
+    border: none;
+    color: var(--texto-secundario);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    position: absolute;
+    left: 0;
+}
+
+.titulo-salao {
+    flex: 1;
+    text-align: center;
+    color: var(--verde-kisabor);
+    font-size: 1.4rem;
+    margin: 0;
+}
+
+.grid-mesas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    animation: fadeIn 0.4s ease;
+}
+
+.btn-mesa {
+    background-color: var(--branco);
+    color: var(--verde-kisabor);
+    border: 2px solid var(--verde-kisabor);
+    border-radius: 12px;
+    padding: 1.5rem 0;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    position: relative; 
+    overflow: hidden; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.numero-mesa {
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.btn-mesa:active:not(:disabled) {
+    background-color: var(--verde-kisabor);
+    color: var(--branco);
+    transform: translateY(2px);
+}
+
+.mesa-ocupada {
+    background-color: #FFF5F5;
+    border-color: #FC8181;
+    color: #A0AEC0;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.faixa-ocupada {
+    background-color: #E53E3E;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    padding: 4px 0;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    text-align: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

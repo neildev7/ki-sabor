@@ -1,0 +1,122 @@
+/* --- src/pages/ResumoPedido/ResumoPedido.css --- */
+.resumo-container {
+    padding-bottom: 120px; /* Espaço para o rodapé fixo */
+}
+
+.header-resumo {
+    background-color: var(--verde-kisabor);
+    color: var(--branco);
+    padding: 2rem 1.5rem 1.5rem;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 15px rgba(74, 93, 35, 0.2);
+}
+
+.btn-voltar {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lista-carrinho {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.item-carrinho {
+    background: var(--branco);
+    padding: 1rem;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid #EDF2F7;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.item-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.item-nome {
+    font-weight: 600;
+    color: var(--texto-principal);
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.btn-remover {
+    background: #FFF5F5;
+    color: #E53E3E;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.item-detalhes {
+    color: var(--texto-secundario);
+    font-size: 0.85rem;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.item-preco {
+    font-weight: bold;
+    color: var(--verde-kisabor);
+    font-size: 1.1rem;
+    align-self: flex-end;
+}
+
+.rodape-finalizar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    background: var(--branco);
+    padding: 1.5rem;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    box-sizing: border-box;
+}
+
+.linha-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    color: var(--texto-principal);
+}
+
+.valor-total {
+    font-weight: 800;
+    color: var(--verde-kisabor);
+    font-size: 1.5rem;
+}
+
+.carrinho-vazio {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: var(--texto-secundario);
+}
