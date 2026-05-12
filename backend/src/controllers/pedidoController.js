@@ -14,7 +14,7 @@ const realizarPedido = async (req, res) => {
             } catch (err) {
                 console.error('Erro ao atualizar status automático:', err);
             }
-        }, 180000); 
+        }, 1000); 
 
         res.status(201).json({
             mensagem: 'Pedido recebido! Você tem 3 minutos para cancelar ou alterar.',
@@ -64,5 +64,52 @@ const apressarPedido = async (req, res) => {
     }
 };
 
+const listarParaCozinha = async (req, res) => {
+    try {
+        const pedidos = await pedidoModel.buscarPedidosCozinha();
+        res.json(pedidos);
+    } catch (error) {
+        console.error('Erro ao buscar pedidos da cozinha:', error);
+        res.status(500).json({ erro: 'Erro ao carregar painel da cozinha' });
+    }
+};
+
+// NOVA: Atualiza o status do pedido (Ex: Confirmado -> Em Preparo -> Pronto)
+const alterarStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { novo_status } = req.body;
+        await pedidoModel.atualizarStatus(id, novo_status);
+        res.json({ mensagem: `Pedido ${id} atualizado para ${novo_status}` });
+    } catch (error) {
+        console.error('Erro ao atualizar status:', error);
+        res.status(500).json({ erro: 'Erro ao atualizar pedido' });
+    }
+};
+
+// NOVA< FUNÇÃO: Puxa a conta da mesa
+const buscarContaMesa = async (req, res) => {
+    try {
+        const conta = await pedidoModel.buscarContaPorMesa(req.params.numero);
+        if (!conta) return res.status(404).json({ erro: 'Mesa não encontrada' });
+        res.json(conta);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao buscar conta da mesa.' });
+    }
+};
+
+const solicitarAjuda = async (req, res) => {
+    try {
+        const { numero_mesa } = req.body;
+        console.log(`🚨 AJUDA: A mesa ${numero_mesa} solicitou um garçom.`);
+        res.json({ mensagem: 'Um garçom foi notificado e logo chegará à sua mesa!' });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao chamar garçom.' });
+    }
+};
+// Adicione buscarContaMesa no module.exports
+
 // Não esqueça de adicionar a função nova no export:
-module.exports = { realizarPedido, buscarStatus, cancelar, apressarPedido };
+module.exports = { realizarPedido, buscarStatus, cancelar, apressarPedido, listarParaCozinha, alterarStatus, buscarContaMesa, solicitarAjuda };
+    

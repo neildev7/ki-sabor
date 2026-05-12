@@ -1,13 +1,14 @@
 const db = require('../config/db');
 
 const listarPizzas = async () => {
-    const [linhas] = await db.execute('SELECT * FROM produtos WHERE id_categoria = 1');
+    // Ao tirar o filtro de categoria, ele busca as Pizzas E as Bebidas!
+    const [linhas] = await db.execute('SELECT * FROM produtos');
     return linhas;
 };
 
-// NOVA FUNÇÃO
 const listarTamanhos = async () => {
-    const [linhas] = await db.execute('SELECT * FROM tamanhos WHERE id_categoria = 1');
+    // Retiramos o "WHERE id_categoria = 1" para buscar todos os tamanhos disponíveis
+    const [linhas] = await db.execute('SELECT * FROM tamanhos');
     return linhas;
 };
 

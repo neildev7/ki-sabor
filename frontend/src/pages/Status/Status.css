@@ -1,124 +1,99 @@
+/* =========================================
+   BASE DA TELA DE STATUS
+   ========================================= */
 .status-container {
+    background-color: var(--fundo-app);
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
-    background-color: var(--fundo-app, #F8F9FA);
 }
 
 .header-status {
-    background-color: var(--verde-kisabor, #4A5D23);
-    color: var(--branco, #FFFFFF);
-    padding: 2.5rem 1rem 1.5rem;
+    background-color: var(--verde-kisabor);
+    color: var(--branco);
+    padding: 2rem 1.5rem 1.5rem;
     text-align: center;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
-    box-shadow: 0 4px 6px rgba(74, 93, 35, 0.3);
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+    box-shadow: 0 4px 15px rgba(74, 93, 35, 0.2);
 }
 
 .header-status p {
-    margin-top: 0.5rem;
-    font-size: 1.1rem;
-    letter-spacing: 1px;
+    margin: 5px 0 0 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
 }
 
 .conteudo-status {
     padding: 2rem 1.5rem;
-    text-align: center;
     flex: 1;
 }
 
-.titulo-pedido {
-    color: var(--verde-kisabor, #4A5D23);
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem;
-    font-weight: 600;
-}
-
 .card-status {
-    background: var(--branco, #FFFFFF);
-    padding: 2rem 1.5rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    margin-bottom: 1.5rem;
-}
-
-.badge-status {
-    display: inline-block;
-    padding: 8px 20px;
+    background: var(--branco);
     border-radius: 20px;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    font-size: 1rem;
+    padding: 2rem 1.5rem;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+    text-align: center;
+    border: 1px solid #edf2f7;
 }
 
+/* --- FASE 1: CRONÔMETRO --- */
 .badge-pendente {
-    background-color: #FEFCBF;
+    background: #FEFCBF;
     color: #B7791F;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 1rem;
 }
 
-.badge-confirmado {
-    background-color: #C6F6D5;
-    color: #22543D;
+.cronometro-circular {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--verde-kisabor);
+    font-family: monospace;
+    margin: 1rem 0;
+    text-shadow: 2px 2px 0px rgba(74, 93, 35, 0.1);
 }
 
 .texto-status {
-    color: var(--texto-secundario, #718096);
+    color: var(--texto-secundario);
     font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-.cronometro {
-    font-size: 4rem;
-    font-weight: 700;
-    color: #E53E3E; /* Vermelho para chamar atenção pro tempo */
-    margin: 1.5rem 0;
-    font-family: monospace;
-    letter-spacing: -2px;
+    margin-bottom: 2rem;
 }
 
 .acoes-pedido {
     display: flex;
-    gap: 12px;
-    margin-top: 1.5rem;
+    gap: 15px;
 }
 
 .btn-acao {
     flex: 1;
     padding: 1rem;
-    border: none;
     border-radius: 12px;
-    font-weight: 600;
-    font-family: 'Poppins', sans-serif;
-    font-size: 1rem;
+    font-weight: bold;
+    border: none;
     cursor: pointer;
-    transition: all 0.2s ease;
+    font-size: 0.9rem;
 }
 
 .btn-editar {
-    background-color: #EDF2F7;
-    color: #4A5568;
+    background: #edf2f7;
+    color: #4a5568;
 }
 
 .btn-cancelar {
-    background-color: #FED7D7;
-    color: #C53030;
+    background: #fff5f5;
+    color: #e53e3e;
 }
 
-.btn-acao:active {
-    transform: scale(0.96);
-}
-
-.btn-acao:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* --- STATUS DINÂMICO E ATRASO --- */
+/* --- FASE 2: STATUS DINÂMICO --- */
 .status-dinamico-container {
-    padding: 2rem 0;
-    border-bottom: 1px solid #EDF2F7;
-    margin-bottom: 1.5rem;
+    padding: 1rem 0;
 }
 
 .icone-gigante {
@@ -132,6 +107,28 @@
     100% { transform: translateY(0px); }
 }
 
+.btn-recebido {
+    width: 100%;
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 1.2rem;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    text-transform: uppercase;
+    animation: pulsarSuave 2s infinite;
+}
+
+@keyframes pulsarSuave {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
 .btn-novo-pedido {
     width: 100%;
     background-color: transparent;
@@ -143,20 +140,15 @@
     font-size: 1.1rem;
     cursor: pointer;
     margin-top: 1rem;
-    transition: all 0.2s;
 }
 
-.btn-novo-pedido:active {
-    background-color: var(--verde-kisabor);
-    color: white;
-}
-
+/* --- ALERTAS --- */
 .alerta-atraso-box {
     background-color: #FFF5F5;
     border: 1px solid #FEB2B2;
     padding: 1.5rem;
     border-radius: 12px;
-    margin-bottom: 1.5rem;
+    margin: 1.5rem 0;
 }
 
 .alerta-atraso-box p {
@@ -173,13 +165,274 @@
     padding: 1rem;
     border-radius: 8px;
     font-weight: bold;
-    font-size: 1rem;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
 }
 
 .btn-apressar:disabled {
     background-color: #48BB78;
-    box-shadow: none;
-    cursor: default;
+}
+
+/* =========================================
+   RECIBO DETALHADO (VISUAL PREMIUM)
+   ========================================= */
+.lista-itens-recibo {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.item-recibo-detalhe {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+}
+
+.item-recibo-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.item-recibo-info strong {
+    color: #1e293b;
+    font-size: 1.05rem;
+    line-height: 1.2;
+}
+
+.item-recibo-info small {
+    color: #64748b;
+    font-size: 0.8rem;
+    background: #f1f5f9;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    width: fit-content;
+}
+
+.item-recibo-preco {
+    font-weight: 800;
+    color: var(--verde-kisabor);
+    font-size: 1.15rem;
+}
+
+.separador-recibo {
+    height: 0;
+    border-top: 2px dashed #cbd5e1;
+    margin: 1.5rem 0;
+}
+
+.linha-recibo {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.05rem;
+    color: #334155;
+    font-weight: 600;
+}
+
+.linha-recibo.taxa-opcional {
+    font-style: normal;
+    color: #64748b;
+    margin-top: 8px;
+    font-weight: 400;
+}
+
+.total-destaque {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.valor-final-opcao {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    border-radius: 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.valor-final-opcao.com-taxa {
+    background-color: var(--verde-kisabor);
+    color: #ffffff;
+    box-shadow: 0 8px 20px rgba(74, 93, 35, 0.25);
+}
+
+.valor-final-opcao.com-taxa strong {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.valor-final-opcao.sem-taxa {
+    background-color: #ffffff;
+    border: 2px solid #e2e8f0;
+    color: #475569;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.aviso-caixa {
+    background: #e0e7ff;
+    color: #4338ca;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 1.5rem;
+    border-left: 4px solid #4f46e5;
+    font-size: 0.9rem;
+}
+
+/* =========================================
+   MÓDULO DE FEEDBACK INTERATIVO
+   ========================================= */
+.container-feedback {
+    margin-top: 2.5rem;
+    padding: 2rem 1.5rem;
+    background: linear-gradient(145deg, #ffffff, #f8fafc);
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    border: 1px solid #e2e8f0;
+}
+
+.container-feedback h3 {
+    text-align: center;
+    color: #0f172a;
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+}
+
+.pergunta-feedback {
+    margin-bottom: 1.5rem;
+    background: #ffffff;
+    padding: 1.2rem;
+    border-radius: 16px;
+    border: 1px solid #edf2f7;
+}
+
+.pergunta-feedback h4 {
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    color: #334155;
+    font-weight: 700;
+    text-align: center;
+}
+
+.botoes-reacao {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-reacao {
+    flex: 1;
+    padding: 12px 8px;
+    border: 2px solid #edf2f7;
+    background: #f8fafc;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-reacao:active {
+    transform: scale(0.95);
+}
+
+.btn-reacao.positivo.ativo {
+    border-color: #10b981;
+    background: #ecfdf5;
+    color: #065f46;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+.btn-reacao.negativo.ativo {
+    border-color: #ef4444;
+    background: #fef2f2;
+    color: #991b1b;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+.textarea-feedback {
+    width: 100%;
+    padding: 16px;
+    border-radius: 16px;
+    border: 2px solid #e2e8f0;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    color: #1e293b;
+    background: #f8fafc;
+    margin-top: 10px;
+    resize: none;
+    box-sizing: border-box;
+}
+
+.textarea-feedback:focus {
+    outline: none;
+    border-color: var(--verde-kisabor);
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(74, 93, 35, 0.15);
+}
+
+.btn-enviar-feedback {
+    width: 100%;
+    background: var(--verde-kisabor);
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin-top: 20px;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+/* --- ESCALA 1 A 10 (NPS) --- */
+.escala-notas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.btn-nota {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-nota:active {
+    transform: scale(0.9);
+}
+
+.btn-nota.ativo {
+    background: var(--verde-kisabor);
+    color: white;
+    border-color: var(--verde-kisabor);
+    box-shadow: 0 4px 10px rgba(74, 93, 35, 0.3);
 }

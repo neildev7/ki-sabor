@@ -53,12 +53,36 @@ const criarNovoPedido = async (dadosPedido) => {
 
 // Atualize apenas esta função no seu pedidoModel.js
 const buscarPedidoPorId = async (id) => {
-    // Adicionamos o 'data_criacao' no SELECT
-    const [linhas] = await db.execute(
-        'SELECT id, status, timer_limite, data_criacao FROM pedidos WHERE id = ?', 
+    // 1. Busca os dados gerais do pedido
+    const [pedidos] = await db.execute(
+        'SELECT id, status, timer_limite, data_criacao, total FROM pedidos WHERE id = ?', 
         [id]
     );
-    return linhas[0];
+    
+    if (pedidos.length === 0) return null;
+    const pedido = pedidos[0];
+
+    // 2. Busca os itens detalhados desse pedido (com preço individual)
+    const [itens] = await db.execute(`
+        SELECT i.id, t.nome as tamanho, i.preco_pago, i.observacoes 
+        FROM itens_pedido i
+        JOIN tamanhos t ON i.id_tamanho = t.id
+        WHERE i.id_pedido = ?
+    `, [id]);
+
+    // 3. Busca os sabores de cada item
+    for (let item of itens) {
+        const [sabores] = await db.execute(`
+            SELECT p.nome 
+            FROM item_sabores isab
+            JOIN produtos p ON isab.id_produto = p.id
+            WHERE isab.id_item_pedido = ?
+        `, [item.id]);
+        item.sabores = sabores.map(s => s.nome);
+    }
+    
+    pedido.itens = itens;
+    return pedido;
 };
 
 // Cancela o pedido se ele ainda estiver pendente
@@ -76,4 +100,80 @@ const atualizarStatus = async (id_pedido, novo_status) => {
     await db.execute('UPDATE pedidos SET status = ? WHERE id = ?', [novo_status, id_pedido]);
 };
 
-module.exports = { criarNovoPedido, atualizarStatus, buscarPedidoPorId, cancelarPedido };
+// Busca pedidos detalhados para o painel da cozinha
+const buscarPedidosCozinha = async () => {
+    // 1. Pega os pedidos ativos ordenados do mais antigo pro mais novo
+    const [pedidos] = await db.execute(`
+        SELECT id, id_mesa, status, data_criacao 
+        FROM pedidos 
+        WHERE status IN ('Confirmado', 'Em Preparo') 
+        ORDER BY data_criacao ASC
+    `);
+
+    // 2. Busca os itens, tamanhos e sabores de cada pedido
+    for (let pedido of pedidos) {
+        const [itens] = await db.execute(`
+            SELECT i.id, t.nome as tamanho, i.observacoes 
+            FROM itens_pedido i
+            JOIN tamanhos t ON i.id_tamanho = t.id
+            WHERE i.id_pedido = ?
+        `, [pedido.id]);
+
+        for (let item of itens) {
+            const [sabores] = await db.execute(`
+                SELECT p.nome 
+                FROM item_sabores isab
+                JOIN produtos p ON isab.id_produto = p.id
+                WHERE isab.id_item_pedido = ?
+            `, [item.id]);
+            // Transforma o array de objetos em um array simples de textos
+            item.sabores = sabores.map(s => s.nome);
+        }
+        pedido.itens = itens;
+    }
+    return pedidos;
+};
+
+// NOVA FUNÇÃO: Busca tudo que a mesa pediu para fechar a conta
+const buscarContaPorMesa = async (numeroMesa) => {
+    // 1. Acha o ID real da mesa baseado no número
+    const [mesas] = await db.execute('SELECT id FROM mesas WHERE numero = ?', [numeroMesa]);
+    if (mesas.length === 0) return null;
+    const idMesa = mesas[0].id;
+
+    // 2. Busca todos os pedidos ativos (não cancelados)
+    const [pedidos] = await db.execute(`
+        SELECT id, status, total, data_criacao 
+        FROM pedidos 
+        WHERE id_mesa = ? AND status != 'Cancelado'
+        ORDER BY data_criacao ASC
+    `, [idMesa]);
+
+    let totalGeral = 0;
+
+    // 3. Busca os itens de cada pedido
+    for (let pedido of pedidos) {
+        const [itens] = await db.execute(`
+            SELECT i.id, t.nome as tamanho, i.preco_pago 
+            FROM itens_pedido i
+            JOIN tamanhos t ON i.id_tamanho = t.id
+            WHERE i.id_pedido = ?
+        `, [pedido.id]);
+
+        for (let item of itens) {
+            const [sabores] = await db.execute(`
+                SELECT p.nome FROM item_sabores isab
+                JOIN produtos p ON isab.id_produto = p.id
+                WHERE isab.id_item_pedido = ?
+            `, [item.id]);
+            item.sabores = sabores.map(s => s.nome);
+        }
+        pedido.itens = itens;
+        totalGeral += Number(pedido.total);
+    }
+
+    return { pedidos, subtotal: totalGeral };
+};
+
+// ATUALIZE O MODULE.EXPORTS PARA INCLUIR A NOVA FUNÇÃO:
+module.exports = { criarNovoPedido, atualizarStatus, buscarPedidoPorId, cancelarPedido, buscarPedidosCozinha, buscarContaPorMesa };

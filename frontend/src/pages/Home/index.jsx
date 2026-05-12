@@ -6,15 +6,13 @@ import './Home.css';
 export default function Home() {
     const [splashAtivo, setSplashAtivo] = useState(true);
     const [mesas, setMesas] = useState([]);
-    
-    // NOVO ESTADO: Controla qual salão o cliente escolheu ('baixo' ou 'cima')
     const [salaoSelecionado, setSalaoSelecionado] = useState(null);
+    const [ajudaSolicitada, setAjudaSolicitada] = useState(false);
     
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const numeroMesaUrl = searchParams.get('mesa');
 
-    // 1. Busca as mesas no banco de dados
     useEffect(() => {
         const carregarMesas = async () => {
             try {
@@ -27,18 +25,14 @@ export default function Home() {
         carregarMesas();
     }, []);
 
-    // 2. Controla o tempo da Animação (3.5 segundos) e o QR Code
     useEffect(() => {
         const timer = setTimeout(() => {
             setSplashAtivo(false);
-            
-            // Se o cliente acessou via QR Code (ex: ?mesa=5)
             if (numeroMesaUrl) {
                 localStorage.setItem('mesa_kisabor', numeroMesaUrl);
                 navigate('/cardapio');
             }
         }, 3500); 
-        
         return () => clearTimeout(timer);
     }, [numeroMesaUrl, navigate]);
 
@@ -48,20 +42,25 @@ export default function Home() {
         navigate('/cardapio');
     };
 
-    // Lógica para filtrar as mesas dependendo do salão clicado
-    const mesasExibidas = mesas.filter(mesa => {
-        if (salaoSelecionado === 'baixo') {
-            return mesa.numero >= 1 && mesa.numero <= 15;
-        } else if (salaoSelecionado === 'cima') {
-            return mesa.numero >= 20 && mesa.numero <= 44;
+    // FUNÇÃO DO NOVO BOTÃO DE AJUDA
+    const solicitarAjuda = async () => {
+        try {
+            await api.post('/pedidos/ajuda', { numero_mesa: 'Recepção / Entrada' });
+            setAjudaSolicitada(true);
+            alert("Sinal enviado! Um atendente já está vindo te ajudar.");
+        } catch (error) {
+            alert("Erro ao chamar ajuda.");
         }
+    };
+
+    const mesasExibidas = mesas.filter(mesa => {
+        if (salaoSelecionado === 'baixo') return mesa.numero >= 1 && mesa.numero <= 15;
+        if (salaoSelecionado === 'cima') return mesa.numero >= 20 && mesa.numero <= 44;
         return false;
     });
 
     return (
         <div className="app-container selecao-mesa-screen">
-            
-            {/* O SPLASH COM AS CLASSES NOVAS DA ANIMAÇÃO DO VENTO */}
             <div className={`splash-overlay ${!splashAtivo ? 'escondido' : ''}`}>
                 <div className="splash-conteudo">
                     <h1 className="splash-logo">Ki-Sabor</h1>
@@ -74,8 +73,6 @@ export default function Home() {
             </header>
 
             <main className="conteudo-mesas">
-                
-                {/* ETAPA 1: O cliente não escolheu o salão ainda */}
                 {!salaoSelecionado ? (
                     <>
                         <h1 className="titulo-boas-vindas">Bem-vindo!</h1>
@@ -98,21 +95,30 @@ export default function Home() {
                                 </div>
                             </button>
                         </div>
+
+                        {/* BOTÃO DE AJUDA NA ENTRADA */}
+                        <button 
+                            className="btn-ajuda-geral" 
+                            onClick={solicitarAjuda}
+                            disabled={ajudaSolicitada}
+                            style={{
+                                marginTop: '2rem', padding: '15px', width: '100%', 
+                                borderRadius: '12px', border: '2px dashed #94a3b8', 
+                                background: ajudaSolicitada ? '#f1f5f9' : 'transparent',
+                                color: '#475569', fontWeight: 'bold', fontSize: '1rem',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            {ajudaSolicitada ? '✅ Um atendente está a caminho' : '🙋 Precisa de ajuda para pedir?'}
+                        </button>
                     </>
                 ) : (
-                /* ETAPA 2: O cliente escolheu o salão, agora escolhe a mesa */
                     <>
                         <div className="cabecalho-mesas">
-                            <button className="btn-voltar-salao" onClick={() => setSalaoSelecionado(null)}>
-                                ⬅ Voltar
-                            </button>
-                            <h2 className="titulo-salao">
-                                {salaoSelecionado === 'baixo' ? 'Salão de Baixo' : 'Salão de Cima'}
-                            </h2>
+                            <button className="btn-voltar-salao" onClick={() => setSalaoSelecionado(null)}>⬅ Voltar</button>
+                            <h2 className="titulo-salao">{salaoSelecionado === 'baixo' ? 'Salão de Baixo' : 'Salão de Cima'}</h2>
                         </div>
-                        
                         <p className="texto-instrucao">Toque no número da sua mesa:</p>
-
                         <div className="grid-mesas">
                             {mesasExibidas.map((mesa) => {
                                 const isOcupada = mesa.status === 'Ocupada';
