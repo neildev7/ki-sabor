@@ -7,11 +7,12 @@ export default function ResumoPedido() {
     const location = useLocation();
     const navigate = useNavigate();
     
-    // Puxa o carrinho que veio da tela de Cardápio. Se não tiver nada, inicia vazio.
     const [carrinho, setCarrinho] = useState(location.state?.carrinho || []);
     const [enviando, setEnviando] = useState(false);
     
+    // Pegamos o número para mostrar na tela e o ID real para enviar ao banco
     const numeroMesa = localStorage.getItem('mesa_kisabor');
+    const idMesaReal = localStorage.getItem('id_mesa_kisabor');
 
     const totalPedido = carrinho.reduce((acc, item) => acc + item.preco, 0);
 
@@ -24,33 +25,29 @@ export default function ResumoPedido() {
         if (carrinho.length === 0) return;
         setEnviando(true);
 
-        // 1. Moldando os itens do carrinho para o formato que o Back-end MySQL espera
+        // 1. Formatando os itens exatamente como o laço de repetição do Back-end espera
         const itensFormatados = carrinho.map(item => ({
-            id_tamanho: Number(item.tamanho.id),
+            tamanho: { id: Number(item.tamanho.id) },
             observacoes: item.observacoes || "",
-            preco_pago: Number(item.preco),
-            sabores: item.sabores // Já é um array de IDs [idBase, idExtra1...]
+            preco: Number(item.preco),
+            sabores: item.sabores 
         }));
 
-        // 2. Montando o Payload final (O Pedido)
+        // 2. Montando o Payload com as chaves que o Controller está buscando
         const payload = {
-            id_mesa: Number(numeroMesa),
-            tipo_atendimento: "Automatico",
-            total: totalPedido,
-            itens: itensFormatados
+            id_mesa: idMesaReal, // Enviando o ID do banco
+            carrinho: itensFormatados // O nome da chave DEVE ser carrinho para evitar o erro de 'forEach'
         };
 
         try {
-            // 3. Dispara pro Back-end!
+            // 3. Dispara pro Back-end
             const response = await api.post('/pedidos', payload);
             
-            // Opcional: Limpar o carrinho local se você estiver usando um Context no futuro.
-            
-            // 4. Redireciona para o Status (onde os 3 minutos começam a contar)
+            // 4. Redireciona usando o ID que o banco acabou de gerar
             navigate(`/status/${response.data.id_pedido}`);
         } catch (error) {
             console.error("Erro ao finalizar:", error);
-            alert("Houve um problema ao enviar seu pedido. Tente novamente.");
+            alert("Houve um problema ao enviar seu pedido. Verifique se o servidor está ligado.");
             setEnviando(false);
         }
     };
@@ -98,7 +95,7 @@ export default function ResumoPedido() {
                             <p className="item-detalhes">
                                 <strong>Tamanho:</strong> {item.tamanho.nome} <br/>
                                 {item.sabores.length > 1 && (
-                                    <span><strong>Extras:</strong> Selecionados no meio a meio<br/></span>
+                                    <span><strong>Sabores:</strong> Meio a meio selecionado<br/></span>
                                 )}
                                 {item.observacoes && (
                                     <span><strong>Obs:</strong> {item.observacoes}</span>

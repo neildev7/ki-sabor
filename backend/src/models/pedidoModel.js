@@ -135,23 +135,28 @@ const buscarPedidosCozinha = async () => {
 };
 
 // NOVA FUNÇÃO: Busca tudo que a mesa pediu para fechar a conta
-const buscarContaPorMesa = async (idMesaReal) => {
-    // UM ÚNICO SELECT GIGANTE COM JOINs (Acaba com o N+1)
+const buscarContaPorMesa = async (numeroMesa) => {
+    const [mesas] = await db.execute('SELECT id, numero, nome_cliente FROM mesas WHERE numero = ?', [numeroMesa]);
+    if (mesas.length === 0) return null;
+    const idMesa = mesas[0].id;
+
+    // A MÁGICA: Busca pedidos da mesa que você clicou E de qualquer mesa vinculada a ela!
     const [linhas] = await db.execute(`
         SELECT 
             p.id as pedido_id, p.status, p.total, p.data_criacao,
+            m.numero as mesa_numero, m.nome_cliente as mesa_nome,
             i.id as item_id, t.nome as tamanho, i.preco_pago,
             prod.nome as sabor_nome
         FROM pedidos p
+        JOIN mesas m ON p.id_mesa = m.id
         LEFT JOIN itens_pedido i ON p.id = i.id_pedido
         LEFT JOIN tamanhos t ON i.id_tamanho = t.id
         LEFT JOIN item_sabores isab ON i.id = isab.id_item_pedido
         LEFT JOIN produtos prod ON isab.id_produto = prod.id
-        WHERE p.id_mesa = ? AND p.status != 'Cancelado'
-        ORDER BY p.data_criacao ASC
-    `, [idMesaReal]);
+        WHERE (p.id_mesa = ? OR m.id_mesa_principal = ?) AND p.status != 'Cancelado' AND p.status != 'Pago'
+        ORDER BY m.numero ASC, p.data_criacao ASC
+    `, [idMesa, idMesa]);
 
-    // Lógica para agrupar as linhas repetidas do banco em Objetos aninhados
     const mapaPedidos = {};
     let subtotalGeral = 0;
 
@@ -159,27 +164,21 @@ const buscarContaPorMesa = async (idMesaReal) => {
         if (!mapaPedidos[row.pedido_id]) {
             mapaPedidos[row.pedido_id] = {
                 id: row.pedido_id, status: row.status, total: row.total, 
-                data_criacao: row.data_criacao, itens: {}
+                data_criacao: row.data_criacao, mesa_numero: row.mesa_numero, mesa_nome: row.mesa_nome, itens: {}
             };
             subtotalGeral += Number(row.total);
         }
 
         if (row.item_id) {
             if (!mapaPedidos[row.pedido_id].itens[row.item_id]) {
-                mapaPedidos[row.pedido_id].itens[row.item_id] = {
-                    id: row.item_id, tamanho: row.tamanho, preco_pago: row.preco_pago, sabores: []
-                };
+                mapaPedidos[row.pedido_id].itens[row.item_id] = { id: row.item_id, tamanho: row.tamanho, preco_pago: row.preco_pago, sabores: [] };
             }
-            if (row.sabor_nome) {
-                mapaPedidos[row.pedido_id].itens[row.item_id].sabores.push(row.sabor_nome);
-            }
+            if (row.sabor_nome) mapaPedidos[row.pedido_id].itens[row.item_id].sabores.push(row.sabor_nome);
         }
     });
 
-    // Transforma os objetos agrupados de volta em arrays para o React entender
     const pedidosFormatados = Object.values(mapaPedidos).map(ped => ({
-        ...ped,
-        itens: Object.values(ped.itens)
+        ...ped, itens: Object.values(ped.itens)
     }));
 
     return { pedidos: pedidosFormatados, subtotal: subtotalGeral };

@@ -84,8 +84,12 @@ export default function Cardapio() {
             // Se for Bebida, reinicia a quantidade
             setQuantidadeBebida(1);
         } else {
-            // Se for Pizza, prepara os tamanhos e fatias
-            const tamanhoPadrao = tamanhos.length > 0 ? tamanhos[0].id : '';
+            // Se for Pizza, procura especificamente o tamanho "Grande"
+            const tamanhoGrande = tamanhos.find(t => t.nome === 'Grande');
+            
+            // Se ele achar a Grande, usa ela. Se der erro e não achar, usa a primeira da lista por segurança.
+            const tamanhoPadrao = tamanhoGrande ? tamanhoGrande.id : (tamanhos.length > 0 ? tamanhos[0].id : '');
+            
             setTamanhoSelecionado(tamanhoPadrao);
             setSaboresAlocados([{ pizza: produto, fatias: getMaxFatias(tamanhoPadrao) }]);
             setBordaSelecionada(null);

@@ -17,6 +17,7 @@ app.get('/ping', (req, res) => {
     res.json({ mensagem: 'Pong! A API da Pizzaria está no ar. 🍕' });
 });
 
+// Automação para confirmar pedidos atrasados
 cron.schedule('* * * * *', async () => {
     try {
         const [pedidosAtrasados] = await db.execute(`
@@ -33,15 +34,22 @@ cron.schedule('* * * * *', async () => {
     }
 });
 
+// ==========================================
+// REGISTRO DE TODAS AS ROTAS DA APLICAÇÃO
+// ==========================================
+
 const produtoRoutes = require('./src/routes/produtoRoutes');
 app.use('/api/produtos', produtoRoutes);
 
-// ADICIONE ESTAS DUAS LINHAS:
 const mesaRoutes = require('./src/routes/mesaRoutes');
 app.use('/api/mesas', mesaRoutes);
 
 const pedidoRoutes = require('./src/routes/pedidoRoutes');
 app.use('/api/pedidos', pedidoRoutes);
+
+// 🔥 A ROTA NOVA DO DASHBOARD QUE FALTAVA 🔥
+const dashboardRoutes = require('./src/routes/dashboardRoutes');
+app.use('/api/dashboard', dashboardRoutes);
 
 // Definindo a porta e ligando o servidor
 const PORT = process.env.PORT || 3333;
