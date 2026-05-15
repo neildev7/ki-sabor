@@ -1,4 +1,7 @@
 const db = require('../config/db');
+const { exec } = require('child_process');
+const path = require('path');
+const fs = require('fs');
 
 const obterDadosFinanceiros = async (req, res) => {
     try {
@@ -63,4 +66,28 @@ const obterDadosFinanceiros = async (req, res) => {
     }
 };
 
-module.exports = { obterDadosFinanceiros };
+
+// Nova função para adicionar no seu dashboardController.js
+const exportarPlanilha = (req, res) => {
+    // Define o caminho onde a planilha vai ser criada
+    const caminhoScript = path.join(__dirname, '../../scripts/gerador_excel.py');
+    const caminhoPlanilha = path.join(__dirname, '../../Relatorio_KiSabor.xlsx');
+
+    // Manda o terminal rodar "python gerador_excel.py caminhoPlanilha"
+    exec(`python "${caminhoScript}" "${caminhoPlanilha}"`, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Erro ao rodar Python: ${error}`);
+            return res.status(500).json({ erro: 'Falha ao gerar o Excel.' });
+        }
+        
+        // Se deu certo, pega o arquivo e manda o navegador do cliente baixar!
+        res.download(caminhoPlanilha, 'Relatorio_Gerencial_Hoje.xlsx', (err) => {
+            if (err) console.error("Erro no download:", err);
+            
+            // Depois que o cara baixou, a gente apaga o arquivo do servidor pra não lotar o HD
+            fs.unlinkSync(caminhoPlanilha);
+        });
+    });
+};
+
+module.exports = { obterDadosFinanceiros, exportarPlanilha }; // Não esqueça de exportar!

@@ -1,103 +1,17 @@
-:root {
-    --bg-dash: #0f172a;
-    --card-bg: #1e293b;
-    --accent: #10b981;
-    --text-main: #f8fafc;
-    --text-sub: #94a3b8;
+/* Reseta o container para ocupar a tela toda sem margens */
+.dashboard-python-container {
+    width: 100%;
+    height: 100vh; /* 100% da altura da tela */
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Esconde barras de rolagem duplas */
+    background-color: #0f172a; /* Cor de fundo escura do seu BI */
 }
 
-.dashboard-container {
-    padding: 30px;
-    background-color: var(--bg-dash);
-    min-height: 100vh;
-    color: var(--text-main);
-    font-family: 'Inter', 'Poppins', sans-serif;
-}
-
-/* Header Estilo Apple */
-.dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 40px;
-    border-bottom: 1px solid #334155;
-    padding-bottom: 20px;
-}
-
-.dashboard-header h1 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    background: linear-gradient(to right, #fff, var(--accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-/* Botões de Aba Estilo Glass */
-.dashboard-abas {
-    display: flex;
-    gap: 15px;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 6px;
-    border-radius: 14px;
-}
-
-.btn-aba {
-    padding: 12px 24px;
-    border: none;
-    background: transparent;
-    border-radius: 10px;
-    color: var(--text-sub);
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.btn-aba.ativa {
-    background: var(--accent);
-    color: var(--bg-dash);
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
-}
-
-/* Cards de Impacto */
-.kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 25px;
-    margin-bottom: 40px;
-}
-
-.kpi-card {
-    background: var(--card-bg);
-    padding: 25px;
-    border-radius: 24px;
-    border: 1px solid #334155;
-    transition: 0.3s;
-}
-
-.kpi-card:hover {
-    border-color: var(--accent);
-    transform: translateY(-5px);
-}
-
-.kpi-titulo { color: var(--text-sub); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; }
-.kpi-valor { display: block; font-size: 2.8rem; font-weight: 900; margin-top: 10px; }
-
-/* Gráficos */
-.graficos-grid {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: 25px;
-}
-
-.grafico-card {
-    background: var(--card-bg);
-    padding: 30px;
-    border-radius: 28px;
-    border: 1px solid #334155;
-}
-
-.grafico-card h3 { margin-bottom: 25px; font-weight: 700; color: var(--accent); }
-
-@media (max-width: 1024px) {
-    .graficos-grid { grid-template-columns: 1fr; }
+/* Deixa o iframe invisível nas bordas e gigante */
+.iframe-python {
+    width: 100%;
+    height: 100%;
+    border: none; /* Tira aquela borda feia de iframe padrão */
+    display: block;
 }

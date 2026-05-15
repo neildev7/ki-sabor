@@ -154,7 +154,56 @@ const salvarFeedback = async (req, res) => {
     }
 };
 
+// NOVA FUNÇÃO: Busca o histórico de contas fechadas para o Caixa
+// Função do Histórico Segura (Sem cálculo de tempo)
+const historicoCaixa = async (req, res) => {
+    try {
+        console.log("🚀 Luka: Iniciando busca de histórico...");
+
+        // 1. Busca os pedidos (mais flexível com o status e a data)
+        const [pedidos] = await db.execute(`
+            SELECT 
+                p.id, 
+                p.total, 
+                p.forma_pagamento, 
+                COALESCE(DATE_FORMAT(p.data_fechamento, '%H:%i'), '--:--') as hora, 
+                p.status, 
+                m.numero as mesa_numero
+            FROM pedidos p
+            LEFT JOIN mesas m ON p.id_mesa = m.id
+            WHERE p.status COLLATE utf8mb4_general_ci = 'Pago'
+            ORDER BY p.id DESC -- Ordena pelo ID para garantir que os últimos apareçam primeiro
+            LIMIT 50
+        `);
+
+        console.log(`🔍 Banco devolveu ${pedidos.length} pedidos pagos.`);
+
+        // 2. Busca os itens de cada pedido
+        for (let pedido of pedidos) {
+            const [itens] = await db.execute(`
+                SELECT 
+                    ip.preco_pago, 
+                    t.nome as tamanho, 
+                    COALESCE(GROUP_CONCAT(prod.nome SEPARATOR ' / '), 'Pizza') as sabores
+                FROM itens_pedido ip
+                LEFT JOIN tamanhos t ON ip.id_tamanho = t.id
+                LEFT JOIN item_sabores isab ON isab.id_item_pedido = ip.id
+                LEFT JOIN produtos prod ON isab.id_produto = prod.id
+                WHERE ip.id_pedido = ?
+                GROUP BY ip.id
+            `, [pedido.id]);
+            
+            pedido.itens = itens;
+        }
+
+        res.json(pedidos);
+    } catch (error) {
+        console.error("🔥 ERRO NO HISTÓRICO:", error);
+        res.status(500).json({ erro: 'Erro interno ao carregar histórico.' });
+    }
+};
 
 
-module.exports = { realizarPedido, buscarStatus, cancelar, apressarPedido, listarParaCozinha, alterarStatus, buscarContaMesa, solicitarAjuda, salvarFeedback };
+
+module.exports = { realizarPedido, buscarStatus, cancelar, apressarPedido, listarParaCozinha, alterarStatus, buscarContaMesa, solicitarAjuda, salvarFeedback, historicoCaixa };
     
