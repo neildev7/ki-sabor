@@ -37,10 +37,11 @@ export default function Home() {
     }, [numeroMesaUrl, navigate]);
 
     const selecionarMesa = (mesa) => {
-        if (mesa.status === 'Ocupada') return;
-        localStorage.setItem('mesa_kisabor', mesa.numero);
-        navigate('/cardapio');
-    };
+    if (mesa.status === 'Ocupada') return;
+    localStorage.setItem('mesa_kisabor', mesa.numero); // Apenas visual
+    localStorage.setItem('id_mesa_kisabor', mesa.id);  // O ID real para o Banco!
+    navigate('/cardapio');
+};
 
     // FUNÇÃO DO NOVO BOTÃO DE AJUDA
     const solicitarAjuda = async () => {

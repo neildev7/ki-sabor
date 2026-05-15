@@ -12,7 +12,7 @@ const criarNovoPedido = async (dadosPedido) => {
 
         // 1. Calcula o timer de 3 minutos (agora + 3 minutos)
         const dataCriacao = new Date();
-        const timerLimite = new Date(dataCriacao.getTime() + 3 * 60000); 
+        const timerLimite = new Date(dataCriacao.getTime() + 3 * 1000); 
 
         // 2. Insere na tabela 'pedidos'
         const [resultPedido] = await conexao.execute(
@@ -88,7 +88,7 @@ const buscarPedidoPorId = async (id) => {
 // Cancela o pedido se ele ainda estiver pendente
 const cancelarPedido = async (id) => {
     const [result] = await db.execute(
-        "UPDATE pedidos SET status = 'Cancelado' WHERE id = ? AND status = 'Pendente'", 
+        "UPDATE pedidos SET status = 'Cancelado' WHERE id = ? AND status = 'Pendente' AND timer_limite > NOW()",
         [id]
     );
     return result.affectedRows > 0;
@@ -135,45 +135,62 @@ const buscarPedidosCozinha = async () => {
 };
 
 // NOVA FUNÇÃO: Busca tudo que a mesa pediu para fechar a conta
-const buscarContaPorMesa = async (numeroMesa) => {
-    // 1. Acha o ID real da mesa baseado no número
-    const [mesas] = await db.execute('SELECT id FROM mesas WHERE numero = ?', [numeroMesa]);
-    if (mesas.length === 0) return null;
-    const idMesa = mesas[0].id;
+const buscarContaPorMesa = async (idMesaReal) => {
+    // UM ÚNICO SELECT GIGANTE COM JOINs (Acaba com o N+1)
+    const [linhas] = await db.execute(`
+        SELECT 
+            p.id as pedido_id, p.status, p.total, p.data_criacao,
+            i.id as item_id, t.nome as tamanho, i.preco_pago,
+            prod.nome as sabor_nome
+        FROM pedidos p
+        LEFT JOIN itens_pedido i ON p.id = i.id_pedido
+        LEFT JOIN tamanhos t ON i.id_tamanho = t.id
+        LEFT JOIN item_sabores isab ON i.id = isab.id_item_pedido
+        LEFT JOIN produtos prod ON isab.id_produto = prod.id
+        WHERE p.id_mesa = ? AND p.status != 'Cancelado'
+        ORDER BY p.data_criacao ASC
+    `, [idMesaReal]);
 
-    // 2. Busca todos os pedidos ativos (não cancelados)
-    const [pedidos] = await db.execute(`
-        SELECT id, status, total, data_criacao 
-        FROM pedidos 
-        WHERE id_mesa = ? AND status != 'Cancelado'
-        ORDER BY data_criacao ASC
-    `, [idMesa]);
+    // Lógica para agrupar as linhas repetidas do banco em Objetos aninhados
+    const mapaPedidos = {};
+    let subtotalGeral = 0;
 
-    let totalGeral = 0;
-
-    // 3. Busca os itens de cada pedido
-    for (let pedido of pedidos) {
-        const [itens] = await db.execute(`
-            SELECT i.id, t.nome as tamanho, i.preco_pago 
-            FROM itens_pedido i
-            JOIN tamanhos t ON i.id_tamanho = t.id
-            WHERE i.id_pedido = ?
-        `, [pedido.id]);
-
-        for (let item of itens) {
-            const [sabores] = await db.execute(`
-                SELECT p.nome FROM item_sabores isab
-                JOIN produtos p ON isab.id_produto = p.id
-                WHERE isab.id_item_pedido = ?
-            `, [item.id]);
-            item.sabores = sabores.map(s => s.nome);
+    linhas.forEach(row => {
+        if (!mapaPedidos[row.pedido_id]) {
+            mapaPedidos[row.pedido_id] = {
+                id: row.pedido_id, status: row.status, total: row.total, 
+                data_criacao: row.data_criacao, itens: {}
+            };
+            subtotalGeral += Number(row.total);
         }
-        pedido.itens = itens;
-        totalGeral += Number(pedido.total);
-    }
 
-    return { pedidos, subtotal: totalGeral };
+        if (row.item_id) {
+            if (!mapaPedidos[row.pedido_id].itens[row.item_id]) {
+                mapaPedidos[row.pedido_id].itens[row.item_id] = {
+                    id: row.item_id, tamanho: row.tamanho, preco_pago: row.preco_pago, sabores: []
+                };
+            }
+            if (row.sabor_nome) {
+                mapaPedidos[row.pedido_id].itens[row.item_id].sabores.push(row.sabor_nome);
+            }
+        }
+    });
+
+    // Transforma os objetos agrupados de volta em arrays para o React entender
+    const pedidosFormatados = Object.values(mapaPedidos).map(ped => ({
+        ...ped,
+        itens: Object.values(ped.itens)
+    }));
+
+    return { pedidos: pedidosFormatados, subtotal: subtotalGeral };
+};
+
+const salvarAvaliacao = async (idPedido, notaPizza, notaServico, comentario) => {
+    await db.execute(
+        'INSERT INTO avaliacoes (id_pedido, nota_pizza, nota_servico, comentario) VALUES (?, ?, ?, ?)',
+        [idPedido, notaPizza, notaServico, comentario]
+    );
 };
 
 // ATUALIZE O MODULE.EXPORTS PARA INCLUIR A NOVA FUNÇÃO:
-module.exports = { criarNovoPedido, atualizarStatus, buscarPedidoPorId, cancelarPedido, buscarPedidosCozinha, buscarContaPorMesa };
+module.exports = { criarNovoPedido, atualizarStatus, buscarPedidoPorId, cancelarPedido, buscarPedidosCozinha, buscarContaPorMesa, salvarAvaliacao };

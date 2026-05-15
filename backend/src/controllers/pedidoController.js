@@ -6,16 +6,6 @@ const realizarPedido = async (req, res) => {
         const dadosPedido = req.body; 
         const resultado = await pedidoModel.criarNovoPedido(dadosPedido);
 
-        // Timer de 3 minutos (180000 ms)
-        setTimeout(async () => {
-            try {
-                await pedidoModel.atualizarStatus(resultado.idPedido, 'Confirmado');
-                console.log(`⏰ Pedido #${resultado.idPedido} confirmado automaticamente após 3 min.`);
-            } catch (err) {
-                console.error('Erro ao atualizar status automático:', err);
-            }
-        }, 1000); 
-
         res.status(201).json({
             mensagem: 'Pedido recebido! Você tem 3 minutos para cancelar ou alterar.',
             id_pedido: resultado.idPedido,
@@ -75,10 +65,19 @@ const listarParaCozinha = async (req, res) => {
 };
 
 // NOVA: Atualiza o status do pedido (Ex: Confirmado -> Em Preparo -> Pronto)
+const STATUS_VALIDOS = ['Confirmado', 'Em Preparo', 'Pronto', 'Entregue', 'Cancelado'];
+
 const alterarStatus = async (req, res) => {
     try {
         const { id } = req.params;
         const { novo_status } = req.body;
+
+        if (!novo_status || !STATUS_VALIDOS.includes(novo_status)) {
+            return res.status(400).json({ 
+                erro: `Status inválido. Valores aceitos: ${STATUS_VALIDOS.join(', ')}` 
+            });
+        }
+
         await pedidoModel.atualizarStatus(id, novo_status);
         res.json({ mensagem: `Pedido ${id} atualizado para ${novo_status}` });
     } catch (error) {
@@ -108,8 +107,21 @@ const solicitarAjuda = async (req, res) => {
         res.status(500).json({ erro: 'Erro ao chamar garçom.' });
     }
 };
-// Adicione buscarContaMesa no module.exports
 
-// Não esqueça de adicionar a função nova no export:
-module.exports = { realizarPedido, buscarStatus, cancelar, apressarPedido, listarParaCozinha, alterarStatus, buscarContaMesa, solicitarAjuda };
+const salvarFeedback = async (req, res) => {
+    try {
+        const { id } = req.params; 
+        const { notaPizza, notaServico, comentario } = req.body;
+        await pedidoModel.salvarAvaliacao(id, notaPizza, notaServico, comentario);
+        
+        res.json({ mensagem: 'Avaliação salva com sucesso!' });
+    } catch (error) {
+        console.error("Erro ao salvar avaliação:", error); 
+        res.status(500).json({ erro: 'Erro ao salvar feedback.' });
+    }
+};
+
+
+
+module.exports = { realizarPedido, buscarStatus, cancelar, apressarPedido, listarParaCozinha, alterarStatus, buscarContaMesa, solicitarAjuda, salvarFeedback };
     

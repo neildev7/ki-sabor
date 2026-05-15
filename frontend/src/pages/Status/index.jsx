@@ -74,10 +74,17 @@ export default function Status() {
         } catch (e) { alert("Erro ao confirmar."); }
     };
 
-    const enviarFeedback = () => {
+    const enviarFeedback = async () => {
         if (!notaPizza || !notaServico) return alert("Avalie a pizza e o serviço dando uma nota de 1 a 10.");
-        console.log({ notaPizza, notaServico, comentario });
-        setFeedbackEnviado(true);
+        
+        try {
+            // Repare que passamos o id_pedido na URL
+            await api.post(`/pedidos/${id_pedido}/avaliacao`, { notaPizza, notaServico, comentario });
+            setFeedbackEnviado(true);
+        } catch (e) {
+            console.error(e);
+            alert("Erro ao enviar avaliação. Verifique sua conexão.");
+        }
     };
 
     if (!pedido || segundosRestantes === null) return <div className="app-container"><p>Sincronizando...</p></div>;

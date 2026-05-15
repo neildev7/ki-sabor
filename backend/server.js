@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const cron = require('node-cron');
 require('dotenv').config();
 
 // Importando a conexão com o banco de dados
@@ -16,6 +17,21 @@ app.get('/ping', (req, res) => {
     res.json({ mensagem: 'Pong! A API da Pizzaria está no ar. 🍕' });
 });
 
+cron.schedule('* * * * *', async () => {
+    try {
+        const [pedidosAtrasados] = await db.execute(`
+            SELECT id FROM pedidos 
+            WHERE status = 'Pendente' AND timer_limite <= NOW()
+        `);
+        
+        for (let pedido of pedidosAtrasados) {
+            await db.execute("UPDATE pedidos SET status = 'Confirmado' WHERE id = ?", [pedido.id]);
+            console.log(`🤖 Cron: Pedido ${pedido.id} confirmado automaticamente.`);
+        }
+    } catch (error) {
+        console.error("Erro no cron job de pedidos:", error);
+    }
+});
 
 const produtoRoutes = require('./src/routes/produtoRoutes');
 app.use('/api/produtos', produtoRoutes);
